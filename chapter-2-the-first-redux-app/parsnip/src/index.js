@@ -2,16 +2,24 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
-import { createStore } from 'redux'
+import { createStore, applyMiddleware } from 'redux'
 import tasks from './reducers'
 import { Provider } from 'react-redux'
-import { devToolsEnhancer } from 'redux-devtools-extension'
+import { composeWithDevTools } from 'redux-devtools-extension'
 import App from './App';
+import thunk from 'redux-thunk'
+
 
 //createStore函数接收3个参数，reducer，初始state和增强器devToolsEnhancer()
 //devToolsEnhancer的作用是连接store和Chrome browser
-const store = createStore(tasks, devToolsEnhancer())
-
+// const store = createStore(tasks, devToolsEnhancer())
+const store = createStore(
+  tasks,
+  //如果使用thunk中间件，devToolsEnhancer就不再起作用
+  //composeWithDevTools是一个可以容纳中间件的方法
+  //用composeWithDevTools包装applyMiddleware函数
+  composeWithDevTools(applyMiddleware(thunk))
+)
 
 ReactDOM.render(
   <React.StrictMode>

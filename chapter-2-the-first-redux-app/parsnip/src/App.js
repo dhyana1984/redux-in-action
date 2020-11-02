@@ -1,7 +1,7 @@
 import TasksPage from './component/TasksPage'
 import { connect } from 'react-redux'
 import React, { Component } from 'react'
-import { createTask, editTask } from './actions';
+import { createTask, editTask, fetchTasks } from './actions';
 
 class APP extends Component {
   onCreateTask = ({ title, description }) => {
@@ -9,7 +9,14 @@ class APP extends Component {
     this.props.dispatch(createAction)
   }
 
+  componentDidMount() {
+    //使用了redux-thunk中间件，所以可以使用dispatch派发函数，否则直接派发函数会报错
+    //初次进入页面，加载数据
+    this.props.dispatch(fetchTasks())
+  }
+
   onStatusChange = (id, status) => {
+    //将要修改的状态以status属性的形式传给editTask
     const editAction = editTask(id, { status })
     this.props.dispatch(editAction)
   }
