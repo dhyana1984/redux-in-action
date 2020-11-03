@@ -3,18 +3,25 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { createStore, applyMiddleware } from 'redux'
-import tasks from './reducers'
 import { Provider } from 'react-redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import App from './App';
 import thunk from 'redux-thunk'
+import tasksReducer from './reducers'
 
+//rootReducer接收store的当前状态和一个action
+const rootReducer = (state = {}, action) => {
+  return {
+    //将任务数据和正在派发的action传给tasks reducer
+    tasks: tasksReducer(state.tasks, action)
+  }
+}
 
 //createStore函数接收3个参数，reducer，初始state和增强器devToolsEnhancer()
 //devToolsEnhancer的作用是连接store和Chrome browser
 // const store = createStore(tasks, devToolsEnhancer())
 const store = createStore(
-  tasks,
+  rootReducer,
   //如果使用thunk中间件，devToolsEnhancer就不再起作用
   //composeWithDevTools是一个可以容纳中间件的方法
   //用composeWithDevTools包装applyMiddleware函数

@@ -82,11 +82,35 @@ const fetchTasksSucceeded = (tasks) => {
     }
 }
 
+const fetchTasksFailed = (error) => {
+    return {
+        type: 'FETCH_TASKS_FAILED',
+        playload: {
+            error
+        }
+    }
+}
+
+const fetchTasksStarted = () => {
+    return {
+        type: 'FETCH_TASKS_STARTED'
+    }
+}
+
+
 const fetchTasks = () => {
     return dispatch => {
+        //派发action创建器fetchTasksStarted来表示请求正在进行
+        //加载loading圈
+        dispatch(fetchTasksStarted())
         api.fetchTask()
             .then(resp => {
-                dispatch(fetchTasksSucceeded(resp.data))
+                // setTimeout(() => {
+                //     dispatch(fetchTasksSucceeded(resp.data))
+                // }, 2000)
+                throw new Error('Oh noes! Unable to fetch tasks!')
+            }).catch(err => {
+                dispatch(fetchTasksFailed(err.message))
             })
     }
 }
