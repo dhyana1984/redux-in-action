@@ -2,6 +2,7 @@ import TasksPage from './component/TasksPage'
 import { connect } from 'react-redux'
 import React, { Component } from 'react'
 import { createTask, editTask, fetchTasks } from './actions';
+import FlashMessage from './component/FlashMessage'
 
 class APP extends Component {
   onCreateTask = ({ title, description }) => {
@@ -23,8 +24,17 @@ class APP extends Component {
 
   render() {
     return (
-      <div className="main-content">
-        <TasksPage tasks={this.props.tasks} onCreateTask={this.onCreateTask} onStatusChange={this.onStatusChange} />
+      <div className="container">
+        {this.props.error &&
+          <FlashMessage message={this.props.error} />}
+        <div className="main-content">
+          <TasksPage
+            tasks={this.props.tasks}
+            onCreateTask={this.onCreateTask}
+            onStatusChange={this.onStatusChange}
+            isLoading={this.props.isLoading}
+          />
+        </div>
       </div>
     )
   }
@@ -33,9 +43,12 @@ class APP extends Component {
 //这里的state就是store的全部内容，通过getState方法可以获得更具体的内容
 //props还会被加入一个dispatch函数，用来执行action
 const mapStateToProps = (state) => {
+  const { tasks, isLoading, error } = state.tasks //这里的tasks是指task recucer中定义的tasks对象
   return {
     //state.tasks被传入组件的props
-    tasks: state.tasks
+    tasks,
+    isLoading,
+    error
   }
 }
 

@@ -15,7 +15,13 @@
 //     }
 // ]
 
-const tasks = (state = { tasks: [] }, action) => {
+const initialState = {
+    tasks: [],
+    isLoading: false,
+    error: null
+}
+
+const tasks = (state = initialState, action) => {
     const { playload } = action
     switch (action.type) {
         case 'CREATE_TASK':
@@ -37,6 +43,7 @@ const tasks = (state = { tasks: [] }, action) => {
             const newTasks = [...state.tasks]
             //一定要返回一个新的对象，指针不指向原来的state，即便是已经修改了原来state的属性
             return {
+                ...state,
                 tasks: newTasks
             }
         case 'FETCH_TASKS_SUCCEEDED':
@@ -45,7 +52,19 @@ const tasks = (state = { tasks: [] }, action) => {
             }
         case 'CREATE_TASK_SUCCEEDED':
             return {
+                ...state,
                 tasks: state.tasks.concat(action.playload.task)
+            }
+        case 'FETCH_TASKS_STARTED':
+            return {
+                ...state,
+                isLoading: true
+            }
+        case 'FETCH_TASKS_FAILED':
+            return {
+                ...state,
+                isLoading: false,
+                error: action.playload.error
             }
         default:
             break;
