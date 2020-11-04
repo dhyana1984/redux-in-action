@@ -8,6 +8,9 @@ import { composeWithDevTools } from 'redux-devtools-extension'
 import App from './App';
 import thunk from 'redux-thunk'
 import tasksReducer from './reducers'
+import logger from './middleware/logger'
+import analytics from './middleware/analytics'
+import apiMiddleware from './middleware/api'
 
 //rootReducer接收store的当前状态和一个action
 const rootReducer = (state = {}, action) => {
@@ -25,7 +28,8 @@ const store = createStore(
   //如果使用thunk中间件，devToolsEnhancer就不再起作用
   //composeWithDevTools是一个可以容纳中间件的方法
   //用composeWithDevTools包装applyMiddleware函数
-  composeWithDevTools(applyMiddleware(thunk))
+  //向applyMiddleware中添加中间件，需要注意顺序，中间件按顺序执行
+  composeWithDevTools(applyMiddleware(thunk, apiMiddleware, logger, analytics))
 )
 
 ReactDOM.render(

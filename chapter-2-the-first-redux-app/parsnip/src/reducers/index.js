@@ -48,12 +48,9 @@ const tasks = (state = initialState, action) => {
             }
         case 'FETCH_TASKS_SUCCEEDED':
             return {
-                tasks: action.playload.tasks
-            }
-        case 'CREATE_TASK_SUCCEEDED':
-            return {
                 ...state,
-                tasks: state.tasks.concat(action.playload.task)
+                tasks: action.playload,
+                isLoading: false
             }
         case 'FETCH_TASKS_STARTED':
             return {
@@ -65,6 +62,17 @@ const tasks = (state = initialState, action) => {
                 ...state,
                 isLoading: false,
                 error: action.playload.error
+            }
+        case 'CREATE_TASKS_STARTED':
+            return {
+                ...state,
+                isLoading: true
+            }
+        case 'CREATE_TASK_SUCCEEDED':
+            return {
+                ...state,
+                tasks: state.tasks.concat(action.playload),
+                isLoading: false
             }
         default:
             break;
