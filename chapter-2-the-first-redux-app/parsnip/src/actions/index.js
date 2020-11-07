@@ -65,6 +65,11 @@ const editTask = (id, params = {}) => {
         api.editTask(id, updateTask)
             .then(resp => {
                 dispatch(editTaskSucceeded(resp.data))
+                if (resp.data.status === 'In Progress') {
+                    return dispatch(progressTimerStart(resp.data.id))
+                } else {
+                    return dispatch(progressTimerStop(resp.data.id))
+                }
             })
     }
 }
@@ -82,20 +87,20 @@ const fetchTasksSucceeded = (tasks) => {
     }
 }
 
-const fetchTasksFailed = (error) => {
-    return {
-        type: 'FETCH_TASKS_FAILED',
-        playload: {
-            error
-        }
-    }
-}
+// const fetchTasksFailed = (error) => {
+//     return {
+//         type: 'FETCH_TASKS_FAILED',
+//         playload: {
+//             error
+//         }
+//     }
+// }
 
-const fetchTasksStarted = () => {
-    return {
-        type: 'FETCH_TASKS_STARTED'
-    }
-}
+// const fetchTasksStarted = () => {
+//     return {
+//         type: 'FETCH_TASKS_STARTED'
+//     }
+// }
 
 
 const fetchTasks = () => {
@@ -116,6 +121,20 @@ const fetchTasks = () => {
     // }
     return {
         type: 'FETCH_TASKS_STARTED'
+    }
+}
+
+const progressTimerStart = (taskId) => {
+    return {
+        type: 'TIMER_STARTED',
+        playload: { taskId }
+    }
+}
+
+const progressTimerStop = (taskId) => {
+    return {
+        type: 'TIMER_STOPPED',
+        playload: { taskId }
     }
 }
 

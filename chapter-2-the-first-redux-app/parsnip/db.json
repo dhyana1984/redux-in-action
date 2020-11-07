@@ -4,55 +4,64 @@
       "id": 1,
       "title": "Learn Redux",
       "description": "The store, actions, and reducers, oh my!",
-      "status": "Complete"
+      "status": "Complete",
+      "timer": 0
     },
     {
       "id": 3,
       "title": "Create Facebook for dogs",
       "description": "The hottest new social network",
-      "status": "Completed"
+      "status": "Completed",
+      "timer": 0
     },
     {
       "title": "a",
       "description": "b",
       "status": "In Progress",
-      "id": 5
+      "id": 5,
+      "timer": 0
     },
     {
       "title": "ccc",
       "description": "ddd",
-      "status": "Unstarted",
-      "id": 6
+      "status": "In Progress",
+      "id": 6,
+      "timer": 203
     },
     {
       "title": "eee",
       "description": "fff",
       "status": "Complete",
-      "id": 7
+      "id": 7,
+      "timer": 0
     },
     {
       "title": "yyyy",
       "description": "yyyy",
       "status": "In Progress",
-      "id": 8
+      "id": 8,
+      "timer": 0
     },
     {
       "title": "pppp",
       "description": "pppp",
-      "status": "Unstarted",
-      "id": 9
+      "status": "Complete",
+      "id": 9,
+      "timer": 5
     },
     {
       "title": "hhh",
       "description": "hhh",
       "status": "Unstarted",
-      "id": 10
+      "id": 10,
+      "timer": 42
     },
     {
       "title": "asdhasjkld",
       "description": "adsfdkslfjadkslfj",
       "status": "Complete",
-      "id": 11
+      "id": 11,
+      "timer": 0
     }
   ]
 }
