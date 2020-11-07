@@ -66,6 +66,16 @@ const tasks = (state = initialState, action) => {
                 isLoading: false,
                 error: action.playload.error
             }
+        case 'TIMER_INCREMENT': {
+            const nextTask = state.tasks.find(task => task.id === action.playload.taskId)
+            nextTask.timer += 1
+            return {
+                ...state,
+                tasks: [...state.tasks]
+            }
+        }
+        case 'TIMER_STOPPED':
+            return state
         default:
             break;
     }
