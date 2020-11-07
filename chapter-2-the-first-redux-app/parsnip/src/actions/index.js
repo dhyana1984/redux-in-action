@@ -70,7 +70,7 @@ const editTask = (id, params = {}) => {
 }
 
 const getTaskById = (tasks, id) => {
-    return tasks.find(task => task.id === id)
+    return tasks.tasks.find(task => task.id === id)
 }
 
 const fetchTasksSucceeded = (tasks) => {
@@ -99,19 +99,23 @@ const fetchTasksStarted = () => {
 
 
 const fetchTasks = () => {
-    return dispatch => {
-        //派发action创建器fetchTasksStarted来表示请求正在进行
-        //加载loading圈
-        dispatch(fetchTasksStarted())
-        api.fetchTask()
-            .then(resp => {
-                // setTimeout(() => {
-                //     dispatch(fetchTasksSucceeded(resp.data))
-                // }, 2000)
-                throw new Error('Oh noes! Unable to fetch tasks!')
-            }).catch(err => {
-                dispatch(fetchTasksFailed(err.message))
-            })
+    //使用saga替代thunk
+    // return dispatch => {
+    //     //派发action创建器fetchTasksStarted来表示请求正在进行
+    //     //加载loading圈
+    //     dispatch(fetchTasksStarted())
+    //     api.fetchTask()
+    //         .then(resp => {
+    //             setTimeout(() => {
+    //                 dispatch(fetchTasksSucceeded(resp.data))
+    //             }, 2000)
+    //             // throw new Error('Oh noes! Unable to fetch tasks!')
+    //         }).catch(err => {
+    //             dispatch(fetchTasksFailed(err.message))
+    //         })
+    // }
+    return {
+        type: 'FETCH_TASKS_STARTED'
     }
 }
 

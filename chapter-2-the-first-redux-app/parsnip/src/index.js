@@ -8,6 +8,12 @@ import { composeWithDevTools } from 'redux-devtools-extension'
 import App from './App';
 import thunk from 'redux-thunk'
 import tasksReducer from './reducers'
+import createSagaMiddleware from 'redux-saga'
+import rootSaga from './saga'
+
+
+//工厂函数，用来创建saga中间件
+const sagaMiddleware = createSagaMiddleware()
 
 //rootReducer接收store的当前状态和一个action
 const rootReducer = (state = {}, action) => {
@@ -25,8 +31,11 @@ const store = createStore(
   //如果使用thunk中间件，devToolsEnhancer就不再起作用
   //composeWithDevTools是一个可以容纳中间件的方法
   //用composeWithDevTools包装applyMiddleware函数
-  composeWithDevTools(applyMiddleware(thunk))
+  composeWithDevTools(applyMiddleware(thunk, sagaMiddleware))
 )
+
+//使用sagaMiddleware实例的run函数初始化saga
+sagaMiddleware.run(rootSaga)
 
 ReactDOM.render(
   <React.StrictMode>
