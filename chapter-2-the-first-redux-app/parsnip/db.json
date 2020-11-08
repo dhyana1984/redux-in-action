@@ -17,14 +17,14 @@
     {
       "title": "a",
       "description": "b",
-      "status": "In Progress",
+      "status": "Unstarted",
       "id": 5,
       "timer": 0
     },
     {
       "title": "ccc",
       "description": "ddd",
-      "status": "In Progress",
+      "status": "Unstarted",
       "id": 6,
       "timer": 203
     },
@@ -52,7 +52,7 @@
     {
       "title": "hhh",
       "description": "hhh",
-      "status": "Unstarted",
+      "status": "Complete",
       "id": 10,
       "timer": 42
     },
