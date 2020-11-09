@@ -5,20 +5,6 @@ const uniqueId = () => {
     return _id++
 }
 
-//函数签名说明需要title和description
-// const createTask = ({ title, description }) => {
-//     //action创建起返回一个action对象
-//     return {
-//         type: 'CREATE_TASK',
-//         playload: {
-//             id: uniqueId(),
-//             title,
-//             description,
-//             status: 'Unstarted'
-//         }
-//     }
-// }
-
 const createTaskSucceeded = (task) => {
     return {
         type: 'CREATE_TASK_SUCCEEDED',
@@ -28,24 +14,14 @@ const createTaskSucceeded = (task) => {
     }
 }
 
-const createTask = ({ title, description, status = 'Unstarted' }) => {
+const createTask = ({ title, description, projectId, status = 'Unstarted' }) => {
     return dispatch => {
-        api.createTask({ title, description, status })
+        api.createTask({ title, description, status, projectId })
             .then(resp => {
                 dispatch(createTaskSucceeded(resp.data))
             })
     }
 }
-
-// const editTask = (id, param = {}) => {
-//     return {
-//         type: 'EDIT_TASK',
-//         playload: {
-//             id,
-//             param
-//         }
-//     }
-// }
 
 const editTaskSucceeded = (task) => {
     return {
@@ -87,38 +63,8 @@ const fetchTasksSucceeded = (tasks) => {
     }
 }
 
-// const fetchTasksFailed = (error) => {
-//     return {
-//         type: 'FETCH_TASKS_FAILED',
-//         playload: {
-//             error
-//         }
-//     }
-// }
-
-// const fetchTasksStarted = () => {
-//     return {
-//         type: 'FETCH_TASKS_STARTED'
-//     }
-// }
-
 
 const fetchTasks = () => {
-    //使用saga替代thunk
-    // return dispatch => {
-    //     //派发action创建器fetchTasksStarted来表示请求正在进行
-    //     //加载loading圈
-    //     dispatch(fetchTasksStarted())
-    //     api.fetchTask()
-    //         .then(resp => {
-    //             setTimeout(() => {
-    //                 dispatch(fetchTasksSucceeded(resp.data))
-    //             }, 2000)
-    //             // throw new Error('Oh noes! Unable to fetch tasks!')
-    //         }).catch(err => {
-    //             dispatch(fetchTasksFailed(err.message))
-    //         })
-    // }
     return {
         type: 'FETCH_TASKS_STARTED'
     }
@@ -142,4 +88,58 @@ const filterTasks = (searchTerm) => {
     return { type: 'FILTER_TASKS', playload: { searchTerm } }
 }
 
-export { uniqueId, createTask, editTask, fetchTasks, fetchTasksSucceeded, filterTasks }
+const fetchProjectsStarted = (boards) => {
+    return {
+        type: 'FETCH_PROJECTS_STARTED',
+        playload: { boards }
+    }
+}
+
+const fetchProjectSucceeded = (projects) => {
+    return {
+        type: 'FETCH_PROJECTS_SUCCEEDED',
+        playload: { projects }
+    }
+}
+
+const fetchProjectsFailed = (err) => {
+    return {
+        type: 'FETCH_PROJECTS_FAILED',
+        playload: err
+    }
+}
+
+const fetchProjects = () => {
+    return (dispatch, getState) => {
+        dispatch(fetchProjectsStarted())
+
+        return api
+            .fetchProjects()
+            .then(resp => {
+                const projects = resp.data
+                dispatch(fetchProjectSucceeded(projects))
+            })
+            .catch(err => {
+                console.error(err)
+                fetchProjectsFailed(err)
+            })
+    }
+}
+
+const setCurrentProjectId = (id) => {
+    return {
+        type: 'SET_CURRENT_PROJECT_ID',
+        playload: { id }
+    }
+}
+
+export {
+    uniqueId,
+    createTask,
+    editTask,
+    fetchTasks,
+    fetchTasksSucceeded,
+    filterTasks,
+    fetchProjects,
+    setCurrentProjectId
+}
