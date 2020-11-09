@@ -138,4 +138,8 @@ const progressTimerStop = (taskId) => {
     }
 }
 
-export { uniqueId, createTask, editTask, fetchTasks, fetchTasksSucceeded }
+const filterTasks = (searchTerm) => {
+    return { type: 'FILTER_TASKS', playload: { searchTerm } }
+}
+
+export { uniqueId, createTask, editTask, fetchTasks, fetchTasksSucceeded, filterTasks }

@@ -1,8 +1,9 @@
 import TasksPage from './component/TasksPage'
 import { connect } from 'react-redux'
 import React, { Component } from 'react'
-import { createTask, editTask, fetchTasks } from './actions';
+import { createTask, editTask, fetchTasks, filterTasks } from './actions';
 import FlashMessage from './component/FlashMessage'
+import { getGroupedAndFilteredTasks } from './reducers'
 
 class APP extends Component {
   onCreateTask = ({ title, description }) => {
@@ -22,6 +23,10 @@ class APP extends Component {
     this.props.dispatch(editAction)
   }
 
+  onSearch = searchTerm => {
+    this.props.dispatch(filterTasks(searchTerm))
+  }
+
   render() {
     return (
       <div className="container">
@@ -33,6 +38,7 @@ class APP extends Component {
             onCreateTask={this.onCreateTask}
             onStatusChange={this.onStatusChange}
             isLoading={this.props.isLoading}
+            onSearch={this.onSearch}
           />
         </div>
       </div>
@@ -43,10 +49,12 @@ class APP extends Component {
 //这里的state就是store的全部内容，通过getState方法可以获得更具体的内容
 //props还会被加入一个dispatch函数，用来执行action
 const mapStateToProps = (state) => {
-  const { tasks, isLoading, error } = state.tasks //这里的tasks是指task recucer中定义的tasks对象
+  const { isLoading, error } = state.tasks //这里的tasks是指task recucer中定义的tasks对象
+  //在此处理搜索task的逻辑，已达到store和视图解耦的目的，这就是选择器
   return {
     //state.tasks被传入组件的props
-    tasks,
+    //getGroupedAndFilteredTasks选择器修改了tasks的数据结构
+    tasks: getGroupedAndFilteredTasks(state),
     isLoading,
     error
   }

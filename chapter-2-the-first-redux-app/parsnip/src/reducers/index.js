@@ -1,5 +1,6 @@
 // import { uniqueId } from '../actions'
-
+import { createSelector } from 'reselect'
+import { TASK_STATUES } from '../constants'
 // const mockTasks = [
 //     {
 //         id: uniqueId(),
@@ -18,7 +19,8 @@
 const initialState = {
     tasks: [],
     isLoading: false,
-    error: null
+    error: null,
+    searchTerm: ''
 }
 
 const tasks = (state = initialState, action) => {
@@ -76,10 +78,43 @@ const tasks = (state = initialState, action) => {
         }
         case 'TIMER_STOPPED':
             return state
+        case 'FILTER_TASKS': {
+            return {
+                ...state,
+                searchTerm: action.playload.searchTerm
+            }
+        }
         default:
             break;
     }
     return state
 }
+
+
+//把getFilteredTasks的参数的决定权交给getFilteredTasks自己，而不是外部传进来
+const getTasks = state => state.tasks.tasks
+const getSearchTerm = state => state.tasks.searchTerm
+
+//通用的task filter选择器，选择器和其对应的recuder放在一起
+//getFilteredTasks是记忆性选择器，使用createSelector创建
+export const getFilteredTasks = createSelector(
+    //getTasks, getSearchTerm被称为输入选择器用作其他记忆性选择器的输入
+    //getFilteredTasks的state参数会被传入getTasks和getSearchTerm
+    [getTasks, getSearchTerm],
+    (tasks, searchTerm) => tasks.filter(task => task.title.match(new RegExp(searchTerm, "i")))
+)
+
+export const getGroupedAndFilteredTasks = createSelector(
+    //使用getFilteredTasks的结果作为输入
+    [getFilteredTasks],
+    tasks => {
+        //以每个状态为键构建对象
+        const grouped = {}
+        TASK_STATUES.forEach(status => {
+            grouped[status] = tasks.filter(task => task.status === status)
+        })
+        return grouped //实际上此时修改了sate的tasks的数据结构，变成了{'Unstarted':[xx,xx], 'In Progress':[xx,xx],'Complete':[xxx,xxx] }
+    }
+)
 
 export default tasks
