@@ -1,4 +1,4 @@
-import { fork, take, put, call, takeLatest, takeEvery, delay } from 'redux-saga/effects'
+import { take, put, call, takeLatest, delay } from 'redux-saga/effects'
 import { channel } from 'redux-saga'
 import { fetchTask } from './api'
 //这是一个生成器
@@ -11,7 +11,6 @@ export default function* rootSaga() {
 
     //初始化takeLatestById辅助函数
     yield takeLatestById(['TIMER_STARTED', 'TIMER_STOPPED'], handleProgressTimer)
-    yield fork(watchSomethingElse)
 }
 
 function* fetchTasks() {
@@ -33,10 +32,6 @@ function* fetchTasks() {
         })
     }
     // }
-}
-
-function* watchSomethingElse() {
-    console.log('watching something else!')
 }
 
 //这就是一个saga
