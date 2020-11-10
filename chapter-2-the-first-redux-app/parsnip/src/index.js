@@ -7,7 +7,7 @@ import { Provider } from 'react-redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import App from './App';
 import thunk from 'redux-thunk'
-import tasksReducer from './reducers'
+import { page, projects } from './reducers'
 import createSagaMiddleware from 'redux-saga'
 import rootSaga from './saga'
 
@@ -18,8 +18,8 @@ const sagaMiddleware = createSagaMiddleware()
 //rootReducer接收store的当前状态和一个action
 const rootReducer = (state = {}, action) => {
   return {
-    //将任务数据和正在派发的action传给tasks reducer
-    tasks: tasksReducer(state.tasks, action)
+    projects: projects(state.projects, action),
+    page: page(state.page, action)
   }
 }
 

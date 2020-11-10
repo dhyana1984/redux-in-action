@@ -21,4 +21,10 @@ const editTask = (id, params) => {
     return axios.put(`${API_BASE_URL}/tasks/${id}`, params)
 }
 
-export { fetchTask, createTask, editTask } 
+const fetchProjects = () => {
+    //在发送响应之前将project的task嵌入每个project的对象中
+    //返回的project对象会包含对应的task对象
+    return client.get('/projects?_embed=tasks')
+}
+
+export { fetchTask, createTask, editTask, fetchProjects } 

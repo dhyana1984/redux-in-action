@@ -1,62 +1,68 @@
-// import { uniqueId } from '../actions'
 import { createSelector } from 'reselect'
 import { TASK_STATUES } from '../constants'
-// const mockTasks = [
-//     {
-//         id: uniqueId(),
-//         title: 'Learn Redux',
-//         description: 'The store, actions, and reducers, oh my!',
-//         status: 'In Progress'
-//     },
-//     {
-//         id: uniqueId(),
-//         title: 'Peace on Earth',
-//         description: 'No big deal',
-//         status: 'In Progress'
-//     }
-// ]
 
 const initialState = {
-    tasks: [],
+    items: [],
     isLoading: false,
     error: null,
-    searchTerm: ''
 }
 
-const tasks = (state = initialState, action) => {
-    const { playload } = action
+export const projects = (state = initialState, action) => {
     switch (action.type) {
+        case 'FETCH_PROJECTS_STARTED': {
+            return {
+                ...state,
+                isLoading: true
+            }
+        }
+        case 'FETCH_PROJECTS_SUCCEEDED': {
+            return {
+                ...state,
+                isLoading: false,
+                items: action.playload.projects
+            }
+        }
         case 'CREATE_TASK':
             return {
                 tasks: state.tasks.concat(action.playload)
             }
         case 'EDIT_TASK':
-            // const editTask = state.tasks.find(t => t.id === playload.id)
-            // editTask.status = playload.status
-            // const newTasks = [...state.tasks]
-            // //一定要返回一个新的对象，指针不指向原来的state，即便是已经修改了原来state的属性
-            // return {
-            //     tasks: newTasks
-            // }
             break
-        case 'EDIT_TASK_SUCCEEDED':
-            const editTask = state.tasks.find(t => t.id === playload.task.id)
-            editTask.status = playload.task.status
-            const newTasks = [...state.tasks]
-            //一定要返回一个新的对象，指针不指向原来的state，即便是已经修改了原来state的属性
+        case 'EDIT_TASK_SUCCEEDED': {
+            const { playload } = action
+            const nextTasks = state.tasks.map(task => {
+                if (task.id === playload.task.id) {
+                    return playload.task
+                }
+                return task
+            })
+
             return {
                 ...state,
-                tasks: newTasks
+                tasks: nextTasks
             }
+        }
         case 'FETCH_TASKS_SUCCEEDED':
             return {
                 tasks: action.playload.tasks
             }
-        case 'CREATE_TASK_SUCCEEDED':
+        case 'CREATE_TASK_SUCCEEDED': {
+            const { task } = action.playload
+            const projectIndex = state.items.findIndex(project => project.id === task.projectId)
+            const project = state.items[projectIndex]
+            const nextProject = {
+                ...project,
+                tasks: project.tasks.concat(task)
+            }
             return {
                 ...state,
-                tasks: state.tasks.concat(action.playload.task)
+                items: [
+                    ...state.items.slice(0, projectIndex),
+                    nextProject,
+                    ...state.items.slice(projectIndex + 1)
+                ]
             }
+        }
         case 'FETCH_TASKS_STARTED':
             return {
                 ...state,
@@ -90,17 +96,47 @@ const tasks = (state = initialState, action) => {
     return state
 }
 
+const initialPageState = {
+    currentProjectId: null,
+    searchTerm: ''
+}
+
+export const page = (state = initialPageState, action) => {
+    switch (action.type) {
+        case 'SET_CURRENT_PROJECT_ID':
+            return {
+                ...state,
+                currentProjectId: action.playload.id
+            }
+        case 'FILTER_TASKS':
+            return {
+                ...state,
+                searchTerm: action.searchTerm
+            }
+        default:
+            return state
+    }
+}
+
 
 //把getFilteredTasks的参数的决定权交给getFilteredTasks自己，而不是外部传进来
-const getTasks = state => state.tasks.tasks
-const getSearchTerm = state => state.tasks.searchTerm
+const getSearchTerm = state => state.page.tasksSearchTerm
+const getTaskByProjectId = state => {
+    if (!state.page.currentProjectId) {
+        return []
+    }
+    const currentProject = state.projects.items.find(project => project.id === state.page.currentProjectId)
+    return currentProject.tasks
+}
+
+
 
 //通用的task filter选择器，选择器和其对应的recuder放在一起
 //getFilteredTasks是记忆性选择器，使用createSelector创建
 export const getFilteredTasks = createSelector(
     //getTasks, getSearchTerm被称为输入选择器用作其他记忆性选择器的输入
     //getFilteredTasks的state参数会被传入getTasks和getSearchTerm
-    [getTasks, getSearchTerm],
+    [getTaskByProjectId, getSearchTerm],
     (tasks, searchTerm) => tasks.filter(task => task.title.match(new RegExp(searchTerm, "i")))
 )
 
@@ -116,5 +152,3 @@ export const getGroupedAndFilteredTasks = createSelector(
         return grouped //实际上此时修改了sate的tasks的数据结构，变成了{'Unstarted':[xx,xx], 'In Progress':[xx,xx],'Complete':[xxx,xxx] }
     }
 )
-
-export default tasks
