@@ -7,7 +7,7 @@ import { Provider } from 'react-redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
 import App from './App';
 import thunk from 'redux-thunk'
-import { page, projects } from './reducers'
+import { page, projects, tasks } from './reducers'
 import createSagaMiddleware from 'redux-saga'
 import rootSaga from './saga'
 
@@ -19,6 +19,7 @@ const sagaMiddleware = createSagaMiddleware()
 const rootReducer = (state = {}, action) => {
   return {
     projects: projects(state.projects, action),
+    tasks: tasks(state.tasks, action),
     page: page(state.page, action)
   }
 }

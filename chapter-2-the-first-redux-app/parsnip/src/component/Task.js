@@ -1,6 +1,6 @@
 import React from 'react'
+import { TASK_STATUES } from '../constants'
 
-const TASK_STATUES = ['Unstarted', 'In Progress', 'Complete']
 //无状态组件，只接收props
 const Task = props => {
     return (
@@ -21,7 +21,7 @@ const Task = props => {
         </div>
     )
     function onStatusChange(e) {
-        props.onStatusChange(props.task.id, e.target.value)
+        props.onStatusChange(props.task, e.target.value)
     }
 }
 

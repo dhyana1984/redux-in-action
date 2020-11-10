@@ -1,14 +1,83 @@
 import { createSelector } from 'reselect'
 import { TASK_STATUES } from '../constants'
 
-const initialState = {
-    items: [],
+
+
+const initialTasksState = {
+    items: {},
+    isLoading: false,
+    error: null
+}
+
+export const tasks = (state = initialTasksState, action) => {
+    switch (action.type) {
+        case 'RECEIVE_ENTITIES': {
+            const { entities } = action.playload
+            if (entities?.tasks) {
+                return {
+                    ...state,
+                    isLoading: false,
+                    items: entities.tasks
+                }
+            }
+            return state
+        }
+        case 'TIMER_INCREMENT': {
+            const nextTasks = Object.keys(state.items).map(taskId => {
+                const task = state.items[taskId];
+
+                if (task.id === action.playload.taskId) {
+                    return { ...task, timer: task.timer + 1 };
+                }
+
+                return task;
+            })
+
+            return {
+                ...state,
+                tasks: nextTasks,
+            };
+        }
+        case 'EDIT_TASK_SUCCEEDED':
+        case 'CREATE_TASK_SUCCEEDED': {
+            const { task } = action.playload
+            //添加新的任务对象
+            //注意，这里的items是对象
+            const nextTasks = {
+                ...state.items,
+                [task.id]: task //将新的task添加到task recucer state的 items中
+            }
+            return {
+                ...state,
+                items: nextTasks
+            }
+        }
+        default:
+            return state
+    }
+}
+
+
+
+const initialPrijectsState = {
+    items: {},
     isLoading: false,
     error: null,
 }
 
-export const projects = (state = initialState, action) => {
+export const projects = (state = initialPrijectsState, action) => {
     switch (action.type) {
+        case 'RECEIVE_ENTITIES': {
+            const { entities } = action.playload
+            if (entities?.projects) {
+                return {
+                    ...state,
+                    isLoading: false,
+                    items: entities.projects
+                }
+            }
+            return state
+        }
         case 'FETCH_PROJECTS_STARTED': {
             return {
                 ...state,
@@ -22,45 +91,23 @@ export const projects = (state = initialState, action) => {
                 items: action.playload.projects
             }
         }
-        case 'CREATE_TASK':
-            return {
-                tasks: state.tasks.concat(action.playload)
-            }
-        case 'EDIT_TASK':
-            break
-        case 'EDIT_TASK_SUCCEEDED': {
-            const { playload } = action
-            const nextTasks = state.tasks.map(task => {
-                if (task.id === playload.task.id) {
-                    return playload.task
-                }
-                return task
-            })
-
-            return {
-                ...state,
-                tasks: nextTasks
-            }
-        }
         case 'FETCH_TASKS_SUCCEEDED':
             return {
                 tasks: action.playload.tasks
             }
         case 'CREATE_TASK_SUCCEEDED': {
             const { task } = action.playload
-            const projectIndex = state.items.findIndex(project => project.id === task.projectId)
-            const project = state.items[projectIndex]
-            const nextProject = {
-                ...project,
-                tasks: project.tasks.concat(task)
-            }
+            const project = state.items[task.projectId]
+            //新增task时候添加到对应的project的item的task数组中
             return {
                 ...state,
-                items: [
-                    ...state.items.slice(0, projectIndex),
-                    nextProject,
-                    ...state.items.slice(projectIndex + 1)
-                ]
+                items: {
+                    ...state.items,
+                    [task.projectId]: {
+                        ...project,
+                        tasks: project.tasks.concat(task.id)
+                    }
+                }
             }
         }
         case 'FETCH_TASKS_STARTED':
@@ -74,16 +121,6 @@ export const projects = (state = initialState, action) => {
                 isLoading: false,
                 error: action.playload.error
             }
-        case 'TIMER_INCREMENT': {
-            const nextTask = state.tasks.find(task => task.id === action.playload.taskId)
-            nextTask.timer += 1
-            return {
-                ...state,
-                tasks: [...state.tasks]
-            }
-        }
-        case 'TIMER_STOPPED':
-            return state
         case 'FILTER_TASKS': {
             return {
                 ...state,
@@ -91,9 +128,9 @@ export const projects = (state = initialState, action) => {
             }
         }
         default:
-            break;
+            return state
     }
-    return state
+
 }
 
 const initialPageState = {
@@ -109,10 +146,7 @@ export const page = (state = initialPageState, action) => {
                 currentProjectId: action.playload.id
             }
         case 'FILTER_TASKS':
-            return {
-                ...state,
-                searchTerm: action.searchTerm
-            }
+            return { ...state, searchTerm: action.playload.searchTerm };
         default:
             return state
     }
@@ -120,13 +154,14 @@ export const page = (state = initialPageState, action) => {
 
 
 //把getFilteredTasks的参数的决定权交给getFilteredTasks自己，而不是外部传进来
-const getSearchTerm = state => state.page.tasksSearchTerm
+const getSearchTerm = state => state.page.searchTerm
 const getTaskByProjectId = state => {
-    if (!state.page.currentProjectId) {
+    const { currentProjectId } = state.page
+    if (!currentProjectId || !state.projects.items[currentProjectId]) {
         return []
     }
-    const currentProject = state.projects.items.find(project => project.id === state.page.currentProjectId)
-    return currentProject.tasks
+    const taskIds = state.projects.items[currentProjectId].tasks
+    return taskIds.map(id => state.tasks.items[id])
 }
 
 
@@ -152,3 +187,9 @@ export const getGroupedAndFilteredTasks = createSelector(
         return grouped //实际上此时修改了sate的tasks的数据结构，变成了{'Unstarted':[xx,xx], 'In Progress':[xx,xx],'Complete':[xxx,xxx] }
     }
 )
+
+export const getProjects = state => {
+    return Object.keys(state.projects.items).map(id => {
+        return state.projects.items[id]
+    })
+}
