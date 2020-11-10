@@ -4,7 +4,7 @@ import React, { Component } from 'react'
 import { createTask, editTask, fetchProjects, filterTasks, setCurrentProjectId } from './actions';
 import FlashMessage from './component/FlashMessage'
 import Header from './component/Header'
-import { getGroupedAndFilteredTasks } from './reducers'
+import { getGroupedAndFilteredTasks, getProjects } from './reducers'
 
 class APP extends Component {
   onCreateTask = ({ title, description }) => {
@@ -18,9 +18,9 @@ class APP extends Component {
     this.props.dispatch(fetchProjects())
   }
 
-  onStatusChange = (id, status) => {
+  onStatusChange = (task, status) => {
     //将要修改的状态以status属性的形式传给editTask
-    const editAction = editTask(id, { status })
+    const editAction = editTask(task, { status })
     this.props.dispatch(editAction)
   }
 
@@ -58,17 +58,16 @@ class APP extends Component {
 //这里的state就是store的全部内容，通过getState方法可以获得更具体的内容
 //props还会被加入一个dispatch函数，用来执行action
 const mapStateToProps = (state) => {
-  const { isLoading, error, items } = state.projects //这里的tasks是指task recucer中定义的tasks对象
-  const { currentProjectId } = state.page
+  const { isLoading, error } = state.projects //这里的tasks是指task recucer中定义的tasks对象
   //在此处理搜索task的逻辑，已达到store和视图解耦的目的，这就是选择器
   return {
     //state.tasks被传入组件的props
     //getGroupedAndFilteredTasks选择器修改了tasks的数据结构
     tasks: getGroupedAndFilteredTasks(state),
-    projects: items,
+    projects: getProjects(state),
+    currentProjectId: state.page.currentProjectId,
     isLoading,
-    error,
-    currentProjectId
+    error
   }
 }
 

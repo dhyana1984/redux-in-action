@@ -10,7 +10,6 @@ export default class Header extends Component {
             <div className="project-item">
                 Project:
                 <select onChange={this.props.onCurrentProjectChange} className="project-menu">
-                    <option>Select your project</option>
                     {projectOptions}
                 </select>
             </div>

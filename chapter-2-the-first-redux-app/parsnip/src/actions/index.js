@@ -1,4 +1,17 @@
 import * as api from '../api'
+import { normalize, schema } from 'normalizr'
+
+const taskSchema = new schema.Entity('tasks')
+const projectSchema = new schema.Entity('projects', {
+    tasks: [taskSchema]
+})
+
+const receiveEntities = (entities) => {
+    return {
+        type: 'RECEIVE_ENTITIES',
+        playload: entities
+    }
+}
 
 let _id = 1
 const uniqueId = () => {
@@ -16,7 +29,7 @@ const createTaskSucceeded = (task) => {
 
 const createTask = ({ title, description, projectId, status = 'Unstarted' }) => {
     return dispatch => {
-        api.createTask({ title, description, status, projectId })
+        api.createTask({ title, description, status, projectId, timer: 0 })
             .then(resp => {
                 dispatch(createTaskSucceeded(resp.data))
             })
@@ -33,12 +46,14 @@ const editTaskSucceeded = (task) => {
 }
 
 //params实际上是包含status属性的一个对象
-const editTask = (id, params = {}) => {
+const editTask = (task, params = {}) => {
     return (dispatch, getState) => {
-        const task = getTaskById(getState().tasks, id)
         //将新status作为params对象的属性合并到现有task中，并且让api.editTask去更新
-        const updateTask = Object.assign({}, task, params)
-        api.editTask(id, updateTask)
+        const updateTask = {
+            ...task,
+            ...params
+        }
+        api.editTask(task.id, updateTask)
             .then(resp => {
                 dispatch(editTaskSucceeded(resp.data))
                 if (resp.data.status === 'In Progress') {
@@ -48,10 +63,6 @@ const editTask = (id, params = {}) => {
                 }
             })
     }
-}
-
-const getTaskById = (tasks, id) => {
-    return tasks.tasks.find(task => task.id === id)
 }
 
 const fetchTasksSucceeded = (tasks) => {
@@ -95,13 +106,6 @@ const fetchProjectsStarted = (boards) => {
     }
 }
 
-const fetchProjectSucceeded = (projects) => {
-    return {
-        type: 'FETCH_PROJECTS_SUCCEEDED',
-        playload: { projects }
-    }
-}
-
 const fetchProjectsFailed = (err) => {
     return {
         type: 'FETCH_PROJECTS_FAILED',
@@ -117,7 +121,16 @@ const fetchProjects = () => {
             .fetchProjects()
             .then(resp => {
                 const projects = resp.data
-                dispatch(fetchProjectSucceeded(projects))
+                //将响应和模式传入normalize
+                const normalizedData = normalize(projects, [projectSchema])
+                //派发规范化数据
+                dispatch(receiveEntities(normalizedData))
+
+                if (!getState().page.setCurrentProjectId) {
+                    //设置默认项目Id
+                    const defaultProjectId = projects[0].id
+                    dispatch(setCurrentProjectId(defaultProjectId))
+                }
             })
             .catch(err => {
                 console.error(err)
