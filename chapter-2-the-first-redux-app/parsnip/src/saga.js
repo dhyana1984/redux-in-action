@@ -23,26 +23,26 @@ function* fetchTasks() {
         //put就是派发新的action
         yield put({
             type: 'FETCH_TASKS_SUCCEEDED',
-            playload: { tasks: data }
+            payload: { tasks: data }
         })
     } catch (e) {
         yield put({
             type: 'FETCH_TASKS_FAILED',
-            playload: { error: e.message }
+            payload: { error: e.message }
         })
     }
     // }
 }
 
 //这就是一个saga
-function* handleProgressTimer({ playload, type }) {
+function* handleProgressTimer({ payload, type }) {
     if (type === 'TIMER_STARTED') {
         //每一秒派发一个TIMER_INCREMENT的action
         while (true) {
             yield delay(1000)//delay用于等待1秒钟
             yield put({
                 type: 'TIMER_INCREMENT',
-                playload: { taskId: playload.taskId }
+                payload: { taskId: payload.taskId }
             })
         }
     }
@@ -54,7 +54,7 @@ function* takeLatestById(actionType, saga) {
 
     while (true) {
         const action = yield take(actionType)
-        const { taskId } = action.playload
+        const { taskId } = action.payload
         //如果任务中不存在通道，创建一个
         if (!channelsMap[taskId]) {
             channelsMap[taskId] = channel()

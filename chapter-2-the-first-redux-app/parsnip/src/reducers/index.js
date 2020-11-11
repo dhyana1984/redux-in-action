@@ -12,7 +12,7 @@ const initialTasksState = {
 export const tasks = (state = initialTasksState, action) => {
     switch (action.type) {
         case 'RECEIVE_ENTITIES': {
-            const { entities } = action.playload
+            const { entities } = action.payload
             if (entities?.tasks) {
                 return {
                     ...state,
@@ -26,7 +26,7 @@ export const tasks = (state = initialTasksState, action) => {
             const nextTasks = Object.keys(state.items).map(taskId => {
                 const task = state.items[taskId];
 
-                if (task.id === action.playload.taskId) {
+                if (task.id === action.payload.taskId) {
                     return { ...task, timer: task.timer + 1 };
                 }
 
@@ -40,7 +40,7 @@ export const tasks = (state = initialTasksState, action) => {
         }
         case 'EDIT_TASK_SUCCEEDED':
         case 'CREATE_TASK_SUCCEEDED': {
-            const { task } = action.playload
+            const { task } = action.payload
             //添加新的任务对象
             //注意，这里的items是对象
             const nextTasks = {
@@ -68,7 +68,7 @@ const initialPrijectsState = {
 export const projects = (state = initialPrijectsState, action) => {
     switch (action.type) {
         case 'RECEIVE_ENTITIES': {
-            const { entities } = action.playload
+            const { entities } = action.payload
             if (entities?.projects) {
                 return {
                     ...state,
@@ -88,15 +88,15 @@ export const projects = (state = initialPrijectsState, action) => {
             return {
                 ...state,
                 isLoading: false,
-                items: action.playload.projects
+                items: action.payload.projects
             }
         }
         case 'FETCH_TASKS_SUCCEEDED':
             return {
-                tasks: action.playload.tasks
+                tasks: action.payload.tasks
             }
         case 'CREATE_TASK_SUCCEEDED': {
-            const { task } = action.playload
+            const { task } = action.payload
             const project = state.items[task.projectId]
             //新增task时候添加到对应的project的item的task数组中
             return {
@@ -119,12 +119,12 @@ export const projects = (state = initialPrijectsState, action) => {
             return {
                 ...state,
                 isLoading: false,
-                error: action.playload.error
+                error: action.payload.error
             }
         case 'FILTER_TASKS': {
             return {
                 ...state,
-                searchTerm: action.playload.searchTerm
+                searchTerm: action.payload.searchTerm
             }
         }
         default:
@@ -143,10 +143,10 @@ export const page = (state = initialPageState, action) => {
         case 'SET_CURRENT_PROJECT_ID':
             return {
                 ...state,
-                currentProjectId: action.playload.id
+                currentProjectId: action.payload.id
             }
         case 'FILTER_TASKS':
-            return { ...state, searchTerm: action.playload.searchTerm };
+            return { ...state, searchTerm: action.payload.searchTerm };
         default:
             return state
     }

@@ -9,7 +9,7 @@ const projectSchema = new schema.Entity('projects', {
 const receiveEntities = (entities) => {
     return {
         type: 'RECEIVE_ENTITIES',
-        playload: entities
+        payload: entities
     }
 }
 
@@ -17,11 +17,16 @@ let _id = 1
 const uniqueId = () => {
     return _id++
 }
+const createTaskRequested = () => {
+    return {
+        type: 'CREATE_TASK_REQUESTED',
+    }
+}
 
 const createTaskSucceeded = (task) => {
     return {
         type: 'CREATE_TASK_SUCCEEDED',
-        playload: {
+        payload: {
             task
         }
     }
@@ -39,7 +44,7 @@ const createTask = ({ title, description, projectId, status = 'Unstarted' }) => 
 const editTaskSucceeded = (task) => {
     return {
         type: 'EDIT_TASK_SUCCEEDED',
-        playload: {
+        payload: {
             task
         }
     }
@@ -68,7 +73,7 @@ const editTask = (task, params = {}) => {
 const fetchTasksSucceeded = (tasks) => {
     return {
         type: 'FETCH_TASKS_SUCCEEDED',
-        playload: {
+        payload: {
             tasks
         }
     }
@@ -84,32 +89,32 @@ const fetchTasks = () => {
 const progressTimerStart = (taskId) => {
     return {
         type: 'TIMER_STARTED',
-        playload: { taskId }
+        payload: { taskId }
     }
 }
 
 const progressTimerStop = (taskId) => {
     return {
         type: 'TIMER_STOPPED',
-        playload: { taskId }
+        payload: { taskId }
     }
 }
 
 const filterTasks = (searchTerm) => {
-    return { type: 'FILTER_TASKS', playload: { searchTerm } }
+    return { type: 'FILTER_TASKS', payload: { searchTerm } }
 }
 
 const fetchProjectsStarted = (boards) => {
     return {
         type: 'FETCH_PROJECTS_STARTED',
-        playload: { boards }
+        payload: { boards }
     }
 }
 
 const fetchProjectsFailed = (err) => {
     return {
         type: 'FETCH_PROJECTS_FAILED',
-        playload: err
+        payload: err
     }
 }
 
@@ -142,7 +147,7 @@ const fetchProjects = () => {
 const setCurrentProjectId = (id) => {
     return {
         type: 'SET_CURRENT_PROJECT_ID',
-        playload: { id }
+        payload: { id }
     }
 }
 
@@ -154,5 +159,7 @@ export {
     fetchTasksSucceeded,
     filterTasks,
     fetchProjects,
-    setCurrentProjectId
+    setCurrentProjectId,
+    createTaskSucceeded,
+    createTaskRequested
 }
